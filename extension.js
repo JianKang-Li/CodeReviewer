@@ -24,7 +24,7 @@ function activate(context) {
     const selection = editor.selection
     const text = document.getText(selection)
 
-    const rules = [/:[^\s]/, /\)\{/, /\{\w|\w\}/,/\}\s\)/, /[\u4e00-\u9fa5]\w/, /,[^\d]/]
+    const rules = [/:[^\s]/, /\)\{/, /\{\w|\w\}/,/\}\s\)/, /[\u4e00-\u9fa5]\w/, /,[^\d\s]/]
 
     const custom = vscode.workspace.getConfiguration("codeReview").get('rules') || []
 
