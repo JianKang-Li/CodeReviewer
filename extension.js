@@ -24,21 +24,35 @@ function activate(context) {
     const selection = editor.selection
     const text = document.getText(selection)
 
-    const rules = [/:\w/, /\)\{/, /\{\w|\w\}/]
+    const rules = [/:[^\s]/, /\)\{/, /\{\w|\w\}/,/\}\s\)/, /[\u4e00-\u9fa5]\w/, /,[^\d]/]
+
+    const custom = vscode.workspace.getConfiguration("codeReview").get('rules') || []
+
+    for (let i of custom) {
+      rules.push(new RegExp(i))
+    }
 
     let sentences = text.split('\n')
     let i = 0
+    const errors = {}
+    let message = []
 
     for (let sentence of sentences) {
       for (let rule of rules) {
         if (rule.test(sentence)) {
           i++
+          errors[rule] = sentence
         }
       }
     }
 
+    Object.keys(errors).forEach((error) => {
+      message.push(`${error}:${errors[error]};`)
+    })
+
     // Display a message box to the user
-    vscode.window.showInformationMessage(`code Reviewer complete, You have ${i} error in the file`);
+    vscode.window.showErrorMessage(`code Reviewer complete, You have ${i} error in the file`);
+    vscode.window.showErrorMessage(`${message}`)
   });
 
   let lint = vscode.commands.registerCommand('codereviewer.lint', function () {

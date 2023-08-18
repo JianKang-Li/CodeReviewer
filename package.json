@@ -4,7 +4,7 @@
   "description": "代码自检",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.81.0"
+    "vscode": "^1.0.0"
   },
   "categories": [
     "Other"
@@ -25,17 +25,16 @@
     "keybindings": [
       {
         "command": "codereviewer.JkReview",
-        "key": "ctrl+r",
-        "mac": "cmd+r",
+        "key": "ctrl+shift+0",
+        "mac": "cmd+shift+0",
         "when": "editorTextFocus"
       }
     ],
     "menus": {
-      "explorer/context": [
+      "editor/title/context": [
         {
           "command": "codereviewer.lint",
-          "group": "JkReview",
-          "when": "explorerResourceIsFolder"
+          "group": "JkReview"
         }
       ]
     }
