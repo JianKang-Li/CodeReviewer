@@ -48,7 +48,11 @@ function activate(context) {
 
     outputChannel.show(true);
     // Display a message box to the user
-    vscode.window.showErrorMessage(`代码自动检查完成，你有${i}个错误在选择的代码片段`,'是');
+    vscode.window.showErrorMessage(`代码自动检查完成，你有${i}个错误在选择的代码片段`,'是').then(res=>{
+      if(res === '是') {
+        outputChannel.clear()
+      }
+    });
   });
 
   let lint = vscode.commands.registerCommand('codereviewer.lint', function () {
