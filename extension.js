@@ -36,20 +36,15 @@ function activate(context) {
 
     const sentences = text.split('\n')
     let i = 0
-    const errors = {}
 
     for (let sentence of sentences) {
       for (let rule in rules) {
         if (rules[rule].test(sentence)) {
           i++
-          errors[rule] = sentence
+          outputChannel.appendLine(`${rule}:~${sentence.trim()};`)
         }
       }
     }
-
-    Object.keys(errors).forEach((error) => {
-      outputChannel.appendLine(`${error}:~${errors[error].trim()};`)
-    })
 
     outputChannel.show(true);
     // Display a message box to the user
