@@ -12,10 +12,9 @@ function activate(context) {
 
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "codereviewer" is now active!');
-
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with  registerCommand
+  const outputChannel =vscode.window.createOutputChannel("CodeReview");
   // The commandId parameter must match the command field in package.json
   let disposable = vscode.commands.registerCommand('codereviewer.JkReview', function () {
     // The code you place here will be executed every time your command is executed
@@ -23,23 +22,25 @@ function activate(context) {
     const document = editor.document
     const selection = editor.selection
     const text = document.getText(selection)
+    const rules = {}
+    const custom = vscode.workspace.getConfiguration("codeReview").get('rules') || {}
 
-    const rules = [/:[^\s]/, /\)\{/, /\{\w|\w\}/,/\}\s\)/, /[\u4e00-\u9fa5]\w/, /,[^\d\s]/]
-
-    const custom = vscode.workspace.getConfiguration("codeReview").get('rules') || []
-
-    for (let i of custom) {
-      rules.push(new RegExp(i))
+    for (let i in custom) {
+      try {
+        rules[i] = new RegExp(custom[i])
+      }
+      catch (e) {
+        vscode.window.showErrorMessage(`自定义错误检查正则存在错误`);
+      }
     }
 
-    let sentences = text.split('\n')
+    const sentences = text.split('\n')
     let i = 0
     const errors = {}
-    let message = []
 
     for (let sentence of sentences) {
-      for (let rule of rules) {
-        if (rule.test(sentence)) {
+      for (let rule in rules) {
+        if (rules[rule].test(sentence)) {
           i++
           errors[rule] = sentence
         }
@@ -47,12 +48,12 @@ function activate(context) {
     }
 
     Object.keys(errors).forEach((error) => {
-      message.push(`${error}:${errors[error]};`)
+      outputChannel.appendLine(`${error}:~${errors[error].trim()};`)
     })
 
+    outputChannel.show(true);
     // Display a message box to the user
-    vscode.window.showErrorMessage(`code Reviewer complete, You have ${i} error in the file`);
-    vscode.window.showErrorMessage(`${message}`)
+    vscode.window.showErrorMessage(`代码自动检查完成，你有${i}个错误在选择的代码片段`,'是');
   });
 
   let lint = vscode.commands.registerCommand('codereviewer.lint', function () {
